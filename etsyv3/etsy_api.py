@@ -85,6 +85,7 @@ class Includes(Enum):
     USER = "User"
     TRANSLATIONS = "Translations"
     INVENTORY = "Inventory"
+    VIDEOS = "Videos"
 
 
 class ListingState(Enum):
