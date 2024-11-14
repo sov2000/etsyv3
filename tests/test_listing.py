@@ -1,5 +1,6 @@
 import unittest
 
+from etsyv3 import EtsyAPI, Includes
 from etsyv3.enums import ListingRequestState, WhenMade, WhoMade
 from etsyv3.models import UpdateListingRequest
 from etsyv3.models.listing_request import (
