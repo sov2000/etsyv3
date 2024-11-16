@@ -146,6 +146,46 @@ class CreateDraftListingRequest(Request):
             mandatory=CreateDraftListingRequest.mandatory,
         )
 
+    @staticmethod
+    def generate_request_from_listing_response(
+        response: Dict[str, Any]
+    ) -> CreateDraftListingRequest:
+        imgs = [i["listing_image_id"] for i in response["images"]] if "images" in response else None
+        schp = response["shipping_profile"]["shipping_profile_id"] if "shipping_profile" in response else None
+        prdp = [p["production_partner_id"] for p in response["production_partners"]] if "production_partners" in response else None
+        return CreateDraftListingRequest(
+            quantity = response["quantity"],
+            title = response["title"],
+            description = response["description"],
+            price = response["price"]["amount"] / response["price"]["divisor"],
+            who_made = WhoMade(response["who_made"]),
+            when_made = WhenMade(response["when_made"]),
+            taxonomy_id = response["taxonomy_id"],
+            shipping_profile_id = schp,
+            materials = response["materials"],
+            shop_section_id = response["shop_section_id"],
+            processing_min = response["processing_min"],
+            processing_max = response["processing_max"],
+            tags = response["tags"],
+            styles = response["style"],
+            item_weight = response["item_weight"],
+            item_length = response["item_length"],
+            item_width = response["item_width"],
+            item_height = response["item_height"],
+            item_weight_unit = response["item_weight_unit"],
+            item_dimensions_unit = response["item_dimensions_unit"],
+            is_personalizable = response["is_personalizable"],
+            personalization_is_required = response["personalization_is_required"],
+            personalization_char_count_max = response["personalization_char_count_max"],
+            personalization_instructions = response["personalization_instructions"],
+            production_partner_ids = prdp,
+            image_ids = imgs,
+            is_supply = response["is_supply"],
+            is_customizable = response["is_customizable"],
+            should_auto_renew = response["should_auto_renew"],
+            is_taxable = response["is_taxable"],
+            listing_type = response["listing_type"]
+        )
 
 class CreateListingTranslationRequest(Request):
     nullable: List[str] = [
