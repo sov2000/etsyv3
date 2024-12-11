@@ -44,8 +44,8 @@ class AuthHelper:
         if state == self.state:
             self.auth_code = code
         else:
-            # per etsy followed RFC 6749 bad state should raise invalid request, https://datatracker.ietf.org/doc/html/rfc6749#section-5.2
-            raise BadRequest('{"error": "invalid_request", "error_description": "State mismatch"}')
+            # etsy follows RFC 6749, per spec bad state should raise invalid request, https://datatracker.ietf.org/doc/html/rfc6749#section-5.2
+            raise BadRequest({"error": "invalid_request", "error_description": "State mismatch"})
 
     def get_access_token(self) -> Optional[str]:
         headers = {
