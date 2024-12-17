@@ -51,6 +51,7 @@ class Request:
 class CreateDraftListingRequest(Request):
     nullable = [
         "shipping_profile_id",
+        "return_policy_id",
         "materials",
         "shop_section_id",
         "processing_min",
@@ -86,6 +87,7 @@ class CreateDraftListingRequest(Request):
         when_made: Optional[WhenMade] = None,
         taxonomy_id: Optional[int] = None,
         shipping_profile_id: Optional[int] = None,
+        return_policy_id: Optional[int] = None,
         materials: Optional[List[str]] = None,
         shop_section_id: Optional[int] = None,
         processing_min: Optional[int] = None,
@@ -118,6 +120,7 @@ class CreateDraftListingRequest(Request):
         self.when_made = when_made
         self.taxonomy_id = taxonomy_id
         self.shipping_profile_id = shipping_profile_id
+        self.return_policy_id = return_policy_id
         self.materials = materials
         self.shop_section_id = shop_section_id
         self.processing_min = processing_min
@@ -150,9 +153,9 @@ class CreateDraftListingRequest(Request):
     def generate_request_from_listing_response(
         response: Dict[str, Any]
     ) -> CreateDraftListingRequest:
-        imgs = [i["listing_image_id"] for i in response["images"]] if "images" in response else None
-        schp = response["shipping_profile"]["shipping_profile_id"] if "shipping_profile" in response else None
-        prdp = [p["production_partner_id"] for p in response["production_partners"]] if "production_partners" in response else None
+        imgs = [i["listing_image_id"] for i in response["images"]] if response.get("images") is not None else None
+        schp = response["shipping_profile"]["shipping_profile_id"] if response.get("shipping_profile") is not None else None
+        prdp = [p["production_partner_id"] for p in response["production_partners"]] if response.get("production_partners") is not None else None
         return CreateDraftListingRequest(
             quantity = response["quantity"],
             title = response["title"],
@@ -162,6 +165,7 @@ class CreateDraftListingRequest(Request):
             when_made = WhenMade(response["when_made"]),
             taxonomy_id = response["taxonomy_id"],
             shipping_profile_id = schp,
+            return_policy_id = response["return_policy_id"],
             materials = response["materials"],
             shop_section_id = response["shop_section_id"],
             processing_min = response["processing_min"],
@@ -238,6 +242,7 @@ class UpdateListingRequest(Request):
         materials: Optional[List[str]] = None,
         should_auto_renew: Optional[bool] = None,
         shipping_profile_id: Optional[int] = None,
+        return_policy_id: Optional[int] = None,
         shop_section_id: Optional[int] = None,
         item_weight: Optional[float] = None,
         item_length: Optional[float] = None,
@@ -266,6 +271,7 @@ class UpdateListingRequest(Request):
         self.materials = materials
         self.should_auto_renew = should_auto_renew
         self.shipping_profile_id = shipping_profile_id
+        self.return_policy_id = return_policy_id
         self.shop_section_id = shop_section_id
         self.item_weight = item_weight
         self.item_length = item_length
@@ -288,6 +294,44 @@ class UpdateListingRequest(Request):
         self.production_partner_ids = production_partner_ids
         self.listing_type = listing_type
         super().__init__(nullable=UpdateListingRequest.nullable)
+
+    @staticmethod
+    def generate_request_from_listing_response(
+        response: Dict[str, Any]
+    ) -> UpdateListingRequest:
+        imgs = [i["listing_image_id"] for i in response["images"]] if response.get("images") is not None else None
+        schp = response["shipping_profile"]["shipping_profile_id"] if response.get("shipping_profile") is not None else None
+        prdp = [p["production_partner_id"] for p in response["production_partners"]] if response.get("production_partners") is not None else None
+        return UpdateListingRequest(
+            image_ids=imgs,
+            title=response["title"],
+            description=response["description"],
+            materials=response["materials"],
+            should_auto_renew=response["should_auto_renew"],
+            shipping_profile_id=schp,
+            return_policy_id=response["return_policy_id"],
+            shop_section_id=response["shop_section_id"],
+            item_weight=response["item_weight"],
+            item_length=response["item_length"],
+            item_width=response["item_width"],
+            item_height=response["item_height"],
+            item_weight_unit=response["item_weight_unit"],
+            item_dimensions_unit=response["item_dimensions_unit"],
+            is_taxable=response["is_taxable"],
+            taxonomy_id=response["taxonomy_id"],
+            tags=response["tags"],
+            who_made=response["who_made"],
+            when_made=response["when_made"],
+            featured_rank=response["featured_rank"],
+            is_personalizable=response["is_personalizable"],
+            personalization_is_required=response["personalization_is_required"],
+            personalization_char_count_max=response["personalization_char_count_max"],
+            personalization_instructions=response["personalization_instructions"],
+            state=response["state"],
+            is_supply=response["is_supply"],
+            production_partner_ids=prdp,
+            listing_type=response["listing_type"]
+        )
 
 
 class UpdateListingInventoryRequest(Request):

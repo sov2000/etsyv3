@@ -20,10 +20,12 @@ def todict(
         return [todict(v, classkey) for v in obj]
     elif hasattr(obj, "__dict__"):
         # I hate this, but it's a way around the reserved name 'type' for now
+        # if key not in nullable and value not in [[], "" or 0]
         data = dict(
             [
                 (key if key != "listing_type" else "type", todict(value, classkey))
-                if key not in nullable and value not in [[], "" or 0]
+                # add bool check to avoid turning False values to None; the allowed value list should just be [[],0] if we want to allow empty string values
+                if type(value) == type(False) or key not in nullable and value not in [[], "", 0]
                 else (key, None)
                 for key, value in obj.__dict__.items()
                 if not callable(value) and not key.startswith("_") and value is not None

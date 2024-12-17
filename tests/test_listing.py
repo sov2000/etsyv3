@@ -41,6 +41,35 @@ class TestListingRequest(unittest.TestCase):
         self.assertTrue("nullable" not in listing.get_dict().keys())
         self.assertEqual("i_did", listing.get_dict()["who_made"])
 
+    def test_null_conversion(self):
+        listing = CreateDraftListingRequest(
+            quantity=1,
+            title="Another title!",
+            description="Description",
+            price=1.10,
+            who_made=WhoMade.I_DID,
+            when_made=WhenMade.MADE_TO_ORDER,
+            personalization_instructions="",
+            is_supply=False,
+            item_width=1,
+            item_height=0,
+            item_weight_unit="",
+            is_taxable=True,
+            taxonomy_id=1,
+            tags=[],
+            materials=["cotton", "wool"]
+        )
+        resultListing = listing.get_dict()
+        self.assertEqual(15, len(resultListing))
+        self.assertEqual("Another title!", resultListing["title"])
+        self.assertIsNone(resultListing["personalization_instructions"])
+        self.assertIsNotNone(resultListing["is_supply"])
+        self.assertFalse(resultListing["is_supply"])
+        self.assertIsNotNone(resultListing["item_width"])
+        self.assertEqual(1, resultListing["item_width"])
+        self.assertIsNone(resultListing["item_height"])
+        self.assertIsNone(resultListing["item_weight_unit"])
+
     def test_listing_inventory_request(self):
         properties = [
             {
